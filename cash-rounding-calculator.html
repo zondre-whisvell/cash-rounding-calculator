@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash Rounding Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 24px;
+        }
+        
+        .input-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        
+        .input-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 4px;
+        }
+        
+        .dollar-sign {
+            font-size: 1.8rem;
+            padding: 0 12px;
+            color: #64748b;
+        }
+        
+        #saleTotal {
+            flex: 1;
+            background: transparent;
+            border: none;
+            font-size: 2rem;
+            color: #fff;
+            padding: 16px 12px;
+            outline: none;
+            width: 100%;
+        }
+        
+        #saleTotal::placeholder {
+            color: #475569;
+        }
+        
+        .result-section {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 4px;
+        }
+        
+        .result-amount {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+        
+        .adjustment {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 8px;
+        }
+        
+        .adjustment.round-up {
+            color: #fef08a;
+        }
+        
+        .adjustment.round-down {
+            color: #86efac;
+        }
+        
+        .rules-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+        }
+        
+        .rules-title {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .rules-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .rule {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        
+        .rule-cents {
+            font-weight: 600;
+            min-width: 45px;
+        }
+        
+        .rule-arrow {
+            color: #64748b;
+        }
+        
+        .rule-result {
+            color: #94a3b8;
+        }
+        
+        .round-down-rule .rule-cents { color: #86efac; }
+        .round-up-rule .rule-cents { color: #fef08a; }
+        
+        .clear-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-top: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 12px;
+            color: #94a3b8;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .clear-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .note {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cash Rounding Calculator</h1>
+        <p class="subtitle">Round to nearest nickel (no pennies)</p>
+        
+        <div class="input-section">
+            <label class="input-label" for="saleTotal">Sale Total from Register</label>
+            <div class="input-wrapper">
+                <span class="dollar-sign">$</span>
+                <input 
+                    type="number" 
+                    id="saleTotal" 
+                    placeholder="0.00" 
+                    step="0.01"
+                    inputmode="decimal"
+                    autocomplete="off"
+                >
+            </div>
+        </div>
+        
+        <div class="result-section">
+            <div class="result-label">Collect from Customer</div>
+            <div class="result-amount" id="roundedAmount">$0.00</div>
+            <div class="adjustment" id="adjustment"></div>
+        </div>
+        
+        <div class="rules-section">
+            <div class="rules-title">Quick Reference</div>
+            <div class="rules-grid">
+                <div class="rule round-down-rule">
+                    <span class="rule-cents">1¢, 2¢</span>
+                    <span class="rule-arrow">→</span>
+                    <span class="rule-result">0¢</span>
+                </div>
+                <div class="rule round-up-rule">
+                    <span class="rule-cents">3¢, 4¢</span>
+                    <span class="rule-arrow">→</span>
+                    <span class="rule-result">5¢</span>
+                </div>
+                <div class="rule round-down-rule">
+                    <span class="rule-cents">6¢, 7¢</span>
+                    <span class="rule-arrow">→</span>
+                    <span class="rule-result">5¢</span>
+                </div>
+                <div class="rule round-up-rule">
+                    <span class="rule-cents">8¢, 9¢</span>
+                    <span class="rule-arrow">→</span>
+                    <span class="rule-result">10¢</span>
+                </div>
+            </div>
+        </div>
+        
+        <button class="clear-btn" onclick="clearInput()">Clear</button>
+        
+        <p class="note">
+            Card transactions are not rounded — exact amount.<br>
+            Rounding applies to cash payments only.
+        </p>
+    </div>
+    
+    <script>
+        const input = document.getElementById('saleTotal');
+        const roundedDisplay = document.getElementById('roundedAmount');
+        const adjustmentDisplay = document.getElementById('adjustment');
+        
+        function roundToNickel(amount) {
+            // Get the cents portion
+            const cents = Math.round((amount % 1) * 100);
+            const lastDigit = cents % 10;
+            const dollars = Math.floor(amount);
+            const baseCents = Math.floor(cents / 10) * 10;
+            
+            let roundedCents;
+            let adjustment;
+            
+            if (lastDigit === 0 || lastDigit === 5) {
+                // Already on a nickel
+                roundedCents = cents;
+                adjustment = 0;
+            } else if (lastDigit === 1 || lastDigit === 2) {
+                // Round down to 0
+                roundedCents = baseCents;
+                adjustment = -lastDigit;
+            } else if (lastDigit === 3 || lastDigit === 4) {
+                // Round up to 5
+                roundedCents = baseCents + 5;
+                adjustment = 5 - lastDigit;
+            } else if (lastDigit === 6 || lastDigit === 7) {
+                // Round down to 5
+                roundedCents = baseCents + 5;
+                adjustment = -(lastDigit - 5);
+            } else if (lastDigit === 8 || lastDigit === 9) {
+                // Round up to 10
+                roundedCents = baseCents + 10;
+                adjustment = 10 - lastDigit;
+            }
+            
+            // Handle cents overflow
+            let finalDollars = dollars;
+            if (roundedCents >= 100) {
+                finalDollars += 1;
+                roundedCents -= 100;
+            }
+            
+            return {
+                rounded: finalDollars + (roundedCents / 100),
+                adjustment: adjustment
+            };
+        }
+        
+        function updateDisplay() {
+            const value = parseFloat(input.value);
+            
+            if (isNaN(value) || value === 0) {
+                roundedDisplay.textContent = '$0.00';
+                adjustmentDisplay.textContent = '';
+                adjustmentDisplay.className = 'adjustment';
+                return;
+            }
+            
+            const result = roundToNickel(value);
+            roundedDisplay.textContent = '$' + result.rounded.toFixed(2);
+            
+            if (result.adjustment === 0) {
+                adjustmentDisplay.textContent = 'No rounding needed';
+                adjustmentDisplay.className = 'adjustment';
+            } else if (result.adjustment > 0) {
+                adjustmentDisplay.textContent = `Rounded up ${result.adjustment}¢`;
+                adjustmentDisplay.className = 'adjustment round-up';
+            } else {
+                adjustmentDisplay.textContent = `Rounded down ${Math.abs(result.adjustment)}¢`;
+                adjustmentDisplay.className = 'adjustment round-down';
+            }
+        }
+        
+        function clearInput() {
+            input.value = '';
+            updateDisplay();
+            input.focus();
+        }
+        
+        input.addEventListener('input', updateDisplay);
+        input.addEventListener('focus', function() {
+            this.select();
+        });
+        
+        // Focus input on load
+        input.focus();
+    </script>
+</body>
+</html>
